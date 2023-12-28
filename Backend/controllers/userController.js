@@ -62,7 +62,7 @@ const loginUser = asyncHandler(async (req, res) => {
   const passwordIsCorrect = await bcrypt.compare(password, user.password);
   if (passwordIsCorrect) {
     const { _id, name, email, photo, phone, bio } = user;
-    const token = await jwt.sign({ _id }, process.env.JWT_SECRET, {
+    const token = await jwt.sign({ id: _id }, process.env.JWT_SECRET, {
       expiresIn: "1d",
     });
     res.cookie("token", token, {
@@ -92,8 +92,19 @@ const logoutUser = asyncHandler(async (req, res) => {
   });
 });
 
+const getUser = asyncHandler(async (req, res) => {
+  let user = req.user;
+  if (user) {
+    res.status(200).send(user);
+  } else {
+    res.status(400);
+    throw new Error("User not found");
+  }
+});
+
 module.exports = {
   registerUser,
   loginUser,
   logoutUser,
+  getUser,
 };
