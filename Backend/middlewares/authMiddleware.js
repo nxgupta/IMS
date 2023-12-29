@@ -3,7 +3,7 @@ const User = require("../models/userModel");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcryptjs");
 
-const protectGetUser = asyncHandler(async (req, res, next) => {
+const protectUser = asyncHandler(async (req, res, next) => {
   try {
     const token = req.cookies.token;
     if (!token) {
@@ -21,5 +21,5 @@ const protectGetUser = asyncHandler(async (req, res, next) => {
 });
 
 module.exports = {
-  protectGetUser,
+  protectUser,
 };
