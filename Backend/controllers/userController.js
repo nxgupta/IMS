@@ -166,16 +166,20 @@ const forgotPassword = asyncHandler(async (req, res) => {
     throw new Error("User not found");
   }
 
+  let tokenExists = Token.findById({ userId: user._id });
+  if (tokenExists) await Token.deleteOne({ userId: user._id });
+
   let resetToken = crypto.randomBytes(32).toString("hex") + user._id;
   const hashedToken = crypto
     .createHash("SHA256")
     .update(resetToken)
     .digest("hex");
+
   await new Token({
     userId: user._id,
     token: hashedToken,
     expiresAt: Date.now() + 30 * (60 * 1000),
-  });
+  }).save();
 
   //Reset Url
   const resetUrl = `${process.env.FRONTEND_URL}/resetPassword/${resetToken}`;
@@ -203,11 +207,36 @@ const forgotPassword = asyncHandler(async (req, res) => {
   }
 });
 
+const resetPassword = asyncHandler(async (req, res) => {
+  let { password } = req.body;
+  let { resetToken } = req.params;
+  const hashedToken = crypto
+    .createHash("SHA256")
+    .update(resetToken)
+    .digest("hex");
+  let userToken = await Token.findOne({
+    token: hashedToken,
+    expiresAt: { $gt: Date.now() },
+  });
+
+  if (!userToken) {
+    res.status(404);
+    throw new Error("Invalid or Expired Token");
+  }
+
+  const user = await User.findOne({ _id: userToken.userId });
+  user.password = password;
+  await user.save();
+  res.status(200).json({
+    message: "Password Reset Successful, Please login",
+  });
+});
+
 async function getPassword(_id) {
   if (_id) {
-    return await User.findById({ _id }, { password: 1, _id: 0 })
-      .select("+password")
-      .lean();
+    return await User.findById({ _id }, { password: 1, _id: 0 }).select(
+      "+password"
+    );
   }
 }
 
@@ -220,4 +249,5 @@ module.exports = {
   updateUser,
   changePassword,
   forgotPassword,
+  resetPassword,
 };
