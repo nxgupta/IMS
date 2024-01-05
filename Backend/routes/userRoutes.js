@@ -11,16 +11,16 @@ const {
   resetPassword,
 } = require("../controllers/userController");
 const { protectUser } = require("../middlewares/authMiddleware");
-const router = express.Router();
+const userRouter = express.Router();
 
-router.route("/register").post(registerUser);
-router.route("/login").post(loginUser);
-router.route("/logout").get(logoutUser);
-router.route("/getUser").get(protectUser, getUser);
-router.route("/loginStatus").get(loginStatus);
-router.route("/updateUser").patch(protectUser, updateUser);
-router.route("/changePassword").patch(protectUser, changePassword);
-router.route("/forgotPassword").post(forgotPassword);
-router.route("/resetPassword/:resetToken").put(resetPassword);
+userRouter.route("/register").post(registerUser);
+userRouter.route("/login").post(loginUser);
+userRouter.route("/logout").get(logoutUser);
+userRouter.route("/getUser").get(protectUser, getUser);
+userRouter.route("/loginStatus").get(loginStatus);
+userRouter.route("/updateUser").patch(protectUser, updateUser);
+userRouter.route("/changePassword").patch(protectUser, changePassword);
+userRouter.route("/forgotPassword").post(forgotPassword);
+userRouter.route("/resetPassword/:resetToken").put(resetPassword);
 
-module.exports = router;
+module.exports = userRouter;
