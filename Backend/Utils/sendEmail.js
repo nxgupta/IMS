@@ -16,7 +16,7 @@ const sendEmail = async (subject, message, sentTo, sendFrom, replyTo) => {
   const options = {
     from: sendFrom,
     to: sentTo,
-    reply: replyTo,
+    replyTo,
     subject,
     html: message,
   };
